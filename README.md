@@ -26,8 +26,6 @@ Potential additional functionality would include:
 
 ## Authors
 
-Jasen Carroll
-jasen.c@icloud.com
-Sept 15, 2015
-
-Note: Base code provided by Udacity
+Jasen Carroll  
+jasen.c@icloud.com  
+Sept 15, 2015  
