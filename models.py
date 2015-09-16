@@ -113,20 +113,23 @@ class ConferenceQueryForms(messages.Message):
 # Here is where we will begin adding functionality for sessions.
 class Session(ndb.Model):
     """Session -- Session object"""
-    name          = ndb.StringProperty(required=True)
-    highlights    = ndb.StringProperty()
-    speaker       = ndb.StringProperty()
-    duration      = ndb.StringProperty()
-    typeOfSession = ndb.StringProperty()
-    date          = ndb.DateProperty()
-    startTime     = ndb.TimeProperty()
+    name            = ndb.StringProperty(required=True)
+    highlights      = ndb.StringProperty()
+    speaker         = ndb.StringProperty()
+    duration        = ndb.StringProperty()
+    typeOfSession   = ndb.StringProperty()
+    date            = ndb.DateProperty()
+    startTime       = ndb.TimeProperty()
 
-class Session(message.Message):
+class SessionForm(messages.Message):
     """Session -- Session outbound form message"""
-    name          = messages.StringField(1)
-    highlights    = messages.StringField(2)
-    speaker       = messages.StringField(3)
-    duration      = messages.StringField(4)
-    typeOfSession = messages.StringField(5)
-    date          = messages.StringField(6)  # DateTimeField()
-    startTime     = messages.StringField(7)  # DateTimeField()
+    name            = messages.StringField(1)
+    highlights      = messages.StringField(2)
+    speaker         = messages.StringField(3)
+    duration        = messages.IntegerField(4)
+    typeOfSession   = messages.StringField(5)
+    date            = messages.StringField(6)
+    startTime       = messages.StringField(7)
+    websafeKey      = messages.StringField(8)
+    conferenceName  = messages.StringField(9)
+    websafeConferenceKey = messages.StringField(10)
