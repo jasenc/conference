@@ -142,3 +142,13 @@ class SessionsByTypeForm(messages.Message):
     """SessionByTypeForm -- Get sessions by filtering type"""
     typeOfSession        = messages.StringField(1)
     websafeConferenceKey = messages.StringField(2)
+
+class SessionsByNameForm(messages.Message):
+    """SessionByTypeForm -- Get sessions by filtering type"""
+    name        = messages.StringField(1)
+    websafeConferenceKey = messages.StringField(2)
+
+class SessionsByDurationForm(messages.Message):
+    """SessionByTypeForm -- Get sessions by filtering type"""
+    duration        = messages.IntegerField(1)
+    websafeConferenceKey = messages.StringField(2)
