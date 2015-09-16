@@ -145,10 +145,14 @@ class SessionsByTypeForm(messages.Message):
 
 class SessionsByNameForm(messages.Message):
     """SessionByTypeForm -- Get sessions by filtering type"""
-    name        = messages.StringField(1)
+    name                 = messages.StringField(1)
     websafeConferenceKey = messages.StringField(2)
 
 class SessionsByDurationForm(messages.Message):
     """SessionByTypeForm -- Get sessions by filtering type"""
-    duration        = messages.IntegerField(1)
+    duration             = messages.IntegerField(1)
     websafeConferenceKey = messages.StringField(2)
+
+class SessionsBySpeakerForm(messages.Message):
+    """SessionByTypeForm -- Get sessions by filtering type"""
+    speaker = messages.StringField(1)
