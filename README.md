@@ -29,3 +29,8 @@ Potential additional functionality would include:
 Jasen Carroll  
 jasen.c@icloud.com  
 Sept 15, 2015  
+
+
+[1]: https://developers.google.com/appengine
+[2]: http://python.org
+[3]: https://developers.google.com/appengine/docs/python/endpoints/
