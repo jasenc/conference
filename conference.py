@@ -35,6 +35,7 @@ from models import ConferenceQueryForms
 from models import TeeShirtSize
 from models import Session
 from models import SessionForm
+from models import SessionForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -91,7 +92,7 @@ CONF_POST_REQUEST = endpoints.ResourceContainer(
     websafeConferenceKey=messages.StringField(1),
 )
 
-SESSION_GET_REQUEST = endpoints.ResourceContainer(
+SESS_GET_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     websafeConferenceKey=messages.StringField(1),
 )
@@ -185,13 +186,27 @@ class ConferenceApi(remote.Service):
 
         # create Session, send email to organizer confirming
         # creation of Session & return (modified) SessionForm
-        # Conference(**data).put()
+        Session(**data).put()
         # taskqueue.add(params={'email': user.email(),
         #     'sessionInfo': repr(request)},
         #     url='/tasks/send_confirmation_email'
         # )
         # send the request over to the form.
         return self._copySessionToForm(request)
+
+    @endpoints.method(SESS_GET_REQUEST, SessionForms,
+            path='conference/session/{websafeConferenceKey}',
+            http_method='GET', name='getConferenceSessions')
+    def getConferenceSessions(self, request):
+        """Return sessions from requested conference (by websafeConferenceKey)."""
+        # Get the conference object from the request.
+        conf = ndb.Key(urlsafe=request.websafeConferenceKey).get().key
+        # Create ancestor query for all sessions
+        sesses = Session.query(ancestor=conf)
+        # Return set of ConferenceForm objects per Conference
+        return SessionForms(
+            items=[self._copySessionToForm(sess) for sess in sesses]
+        )
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 
