@@ -54,6 +54,8 @@ API_EXPLORER_CLIENT_ID = endpoints.API_EXPLORER_CLIENT_ID
 MEMCACHE_ANNOUNCEMENTS_KEY = "RECENT_ANNOUNCEMENTS"
 ANNOUNCEMENT_TPL = ('Last chance to attend! The following conferences '
                     'are nearly sold out: %s')
+MEMCACHE_SPEAKER_KEY = "FEATURED_SPEAKER"
+SPEAKER_TPL = ('Our featured speaker for this session is: %s!')
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 DEFAULTS = {
@@ -304,6 +306,33 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
 
+# - - - Featured Speaker - - - - - - - - - - - - - - - - -
+
+    @staticmethod
+    def _cacheSpeaker(speaker):
+        """Replace the default featured speaker with anyone that is determined
+        to be the speaker at more than one session.
+        """
+        # First we'll grab all of the sessions, using fetch(), that has a speaker.
+        sesses = Session.query(Session.speaker == speaker).fetch()
+        # If more than one session is returned:
+        if len(sesses) > 1:
+            # Update the string to have the new speaker.
+            featSpeak = (SPEAKER_TPL % speaker)
+            # Set the Memcache with the update.
+            memcache.set(MEMCACHE_SPEAKER_KEY, featSpeak)
+        # Otherwise set the featSpeak equal to whatever it was before.
+        else:
+            featSpeak = (memcache.get(MEMCACHE_SPEAKER_KEY) or "")
+        # Return the featured speaker.
+        return featSpeak
+
+    @endpoints.method(message_types.VoidMessage, StringMessage,
+            path='conference/featSpeaker/get',
+            http_method='GET', name='getFeaturedSpeaker')
+    def getFeaturedSpeaker(self, request):
+        """Return the Featured Speaker from memcache."""
+        return StringMessage(data=memcache.get(MEMCACHE_SPEAKER_KEY) or "")
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 
