@@ -40,6 +40,7 @@ from models import SessionsByTypeForm
 from models import SessionsByNameForm
 from models import SessionsByDurationForm
 from models import SessionsBySpeakerForm
+from models import WishlistForm
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -269,6 +270,25 @@ class ConferenceApi(remote.Service):
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
+
+# - - - Wishlists - - - - - - - - - - - - - - - - -
+
+    @endpoints.method(WishlistForm, ProfileForm,
+                      path="session/addwishlist",
+                      http_method='POST',
+                      name="addSessionToWishlist")
+    def addSessionToWishlist(self, save_request=None):
+        """Add a session to the user's wishlist"""
+        prof = self._getProfileFromUser
+        if save_request:
+            for field in ('websafeSessionKey'):
+                if hasattr(save_request, field):
+                    val = getattr(save_request, field)
+                    if val:
+                        if field == 'websafeSessionKey':
+                            prof.websafeSessionKey.append(str(val))
+                            prof.put()
+        return self._copyProfileToForm(prof)
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 

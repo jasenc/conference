@@ -156,3 +156,8 @@ class SessionsByDurationForm(messages.Message):
 class SessionsBySpeakerForm(messages.Message):
     """SessionByTypeForm -- Get sessions by filtering type"""
     speaker = messages.StringField(1)
+
+class WishlistForm(messages.Message):
+    """WishlistForm -- Form for adding a session to wishlist"""
+    websafeConferenceKey = messages.StringField(1)
+    websafeSessionKey = messages.StringField(2)
