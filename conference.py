@@ -260,8 +260,8 @@ class ConferenceApi(remote.Service):
     @endpoints.method(SessionsBySpeakerForm, SessionForms,
             path='conference/speaker',
             http_method='GET',
-            name='getConferenceSessionsBySpeaker')
-    def getConferenceSessionsByDuration(self, request):
+            name='getSessionsBySpeaker')
+    def getSessionsBySpeaker(self, request):
         """Query for conference sessions by speaker."""
         # Create ancestor query for all sessions
         sesses = Session.query(Session.speaker == request.speaker)
