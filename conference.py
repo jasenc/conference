@@ -208,7 +208,7 @@ class ConferenceApi(remote.Service):
         conf = ndb.Key(urlsafe=request.websafeConferenceKey).get().key
         # Create ancestor query for all sessions
         sesses = Session.query(ancestor=conf)
-        # Return set of ConferenceForm objects per Conference
+        # Return set of SessionForm objects per Session
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
@@ -221,9 +221,9 @@ class ConferenceApi(remote.Service):
         """Query for conference sessions by type."""
         # Get the conference object from the request.
         conf = ndb.Key(urlsafe=request.websafeConferenceKey).get().key
-        # Create ancestor query for all sessions
+        # Create filter for query
         sesses = Session.query(Session.typeOfSession == request.typeOfSession)
-        # Return set of ConferenceForm objects per Conference
+        # Return set of SessionForm objects per Session
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
@@ -236,9 +236,9 @@ class ConferenceApi(remote.Service):
         """Query for conference sessions by name."""
         # Get the conference object from the request.
         conf = ndb.Key(urlsafe=request.websafeConferenceKey).get().key
-        # Create ancestor query for all sessions
+        # Create filter for query
         sesses = Session.query(Session.name == request.name)
-        # Return set of ConferenceForm objects per Conference
+        # Return set of SessionForm objects per Session
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
@@ -251,9 +251,9 @@ class ConferenceApi(remote.Service):
         """Query for conference sessions by duration."""
         # Get the conference object from the request.
         conf = ndb.Key(urlsafe=request.websafeConferenceKey).get().key
-        # Create ancestor query for all sessions
+        # Create filter for query
         sesses = Session.query(Session.duration == request.duration)
-        # Return set of ConferenceForm objects per Conference
+        # Return set of SessionForm objects per Session
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
@@ -266,7 +266,7 @@ class ConferenceApi(remote.Service):
         """Query for conference sessions by speaker."""
         # Create ancestor query for all sessions
         sesses = Session.query(Session.speaker == request.speaker)
-        # Return set of ConferenceForm objects per Conference
+        # Return set of SessionForm objects per Session
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sesses]
         )
@@ -274,14 +274,36 @@ class ConferenceApi(remote.Service):
 # - - - Wishlists - - - - - - - - - - - - - - - - -
 
     @endpoints.method(WishlistForm, ProfileForm,
-                      path="addSessionToWishlist",
-                      http_method='POST',
+                      path="profile/addSessionToWishlist",
+                      http_method="POST",
                       name="addSessionToWishlist")
     def addSessionToWishlist(self, request):
         """Add a session to the user's wishlist"""
         # Update the profile, simpler to include a couple of lines of code in
         # _doProfile than create a new method for updating profile.
         return self._doProfile(request)
+
+    @endpoints.method(WishlistForm, SessionForms,
+                      path="profile/wishlist",
+                      http_method="POST",
+                      name="getSessionsInWishlist")
+    def getSessionsInWishlist(self, request):
+        """Get the sessions a user has saved to their wishlist"""
+        # Get the current user.
+        user = endpoints.get_current_user()
+        # If there isn't one, raise an authorization exception.
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+        # Get their profile
+        prof = self._getProfileFromUser()
+        # Get the session keys they have saved in their wishlist.
+        wish_keys = [ndb.Key(urlsafe=skwl) for skwl in prof.sessionKeyWishlist]
+        # Query the session with the keys in wish_keys
+        sesses = Session.query(Session.key.IN(wish_keys))
+        return SessionForms(
+            items=[self._copySessionToForm(sess) for sess in sesses]
+        )
+
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 
