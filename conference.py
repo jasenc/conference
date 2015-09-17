@@ -274,21 +274,14 @@ class ConferenceApi(remote.Service):
 # - - - Wishlists - - - - - - - - - - - - - - - - -
 
     @endpoints.method(WishlistForm, ProfileForm,
-                      path="session/addwishlist",
+                      path="addSessionToWishlist",
                       http_method='POST',
                       name="addSessionToWishlist")
-    def addSessionToWishlist(self, save_request=None):
+    def addSessionToWishlist(self, request):
         """Add a session to the user's wishlist"""
-        prof = self._getProfileFromUser
-        if save_request:
-            for field in ('websafeSessionKey'):
-                if hasattr(save_request, field):
-                    val = getattr(save_request, field)
-                    if val:
-                        if field == 'websafeSessionKey':
-                            prof.websafeSessionKey.append(str(val))
-                            prof.put()
-        return self._copyProfileToForm(prof)
+        # Update the profile, simpler to include a couple of lines of code in
+        # _doProfile than create a new method for updating profile.
+        return self._doProfile(request)
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 
@@ -573,15 +566,16 @@ class ConferenceApi(remote.Service):
 
         # if saveProfile(), process user-modifyable fields
         if save_request:
-            for field in ('displayName', 'teeShirtSize'):
+            for field in ('displayName', 'teeShirtSize', 'sessionKeyWishlist'):
                 if hasattr(save_request, field):
                     val = getattr(save_request, field)
                     if val:
-                        setattr(prof, field, str(val))
-                        #if field == 'teeShirtSize':
-                        #    setattr(prof, field, str(val).upper())
-                        #else:
-                        #    setattr(prof, field, val)
+                        if field == 'teeShirtSize':
+                            setattr(prof, field, str(val).upper())
+                        if field == 'sessionKeyWishlist':
+                            prof.sessionKeyWishlist.append(str(val))
+                        else:
+                            setattr(prof, field, val)
                         prof.put()
 
         # return ProfileForm
