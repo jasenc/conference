@@ -104,6 +104,11 @@ SESS_GET_REQUEST = endpoints.ResourceContainer(
     websafeConferenceKey=messages.StringField(1),
 )
 
+SESS_POST_REQUEST = endpoints.ResourceContainer(
+    SessionForm,
+    websafeConferenceKey=messages.StringField(1, required=True),
+)
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -122,7 +127,7 @@ class ConferenceApi(remote.Service):
         for field in sf.all_fields():
             if hasattr(sess, field.name):
                 # convert Date to date string; just copy others
-                if field.name.endswith('Date') or field.name.endswith('Time'):
+                if field.name == 'date' or field.name 'time'):
                     setattr(sf, field.name, str(getattr(sess, field.name)))
                 else:
                     setattr(sf, field.name, getattr(sess, field.name))
@@ -132,8 +137,8 @@ class ConferenceApi(remote.Service):
         return sf
 
     # Define an endpoint for adding sessions
-    @endpoints.method(SessionForm, SessionForm,
-                      path = 'session',
+    @endpoints.method(SESS_POST_REQUEST, SessionForm,
+                      path = 'session/{websafeConferenceKey}',
                       http_method = 'POST',
                       name = 'createSession')
     def createSession(self, request):
@@ -194,15 +199,14 @@ class ConferenceApi(remote.Service):
         # create Session, send email to organizer confirming
         # creation of Session & return (modified) SessionForm
         Session(**data).put()
-        # taskqueue.add(params={'email': user.email(),
-        #     'sessionInfo': repr(request)},
-        #     url='/tasks/send_confirmation_email'
-        # )
+        sesses = Session.query(Session.speaker == data['speaker']).count()
+        if sessions > 1:
+            taskqueue.add(params={'speaker': data['speaker']}, url='/tasks/set_featured_speaker')
         # send the request over to the form.
         return self._copySessionToForm(request)
 
     @endpoints.method(SESS_GET_REQUEST, SessionForms,
-            path='session/{websafeConferenceKey}',
+            path='sessions/get/{websafeConferenceKey}',
             http_method='GET', name='getConferenceSessions')
     def getConferenceSessions(self, request):
         """Return sessions from requested conference (by websafeConferenceKey)."""
