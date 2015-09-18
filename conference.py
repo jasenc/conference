@@ -133,7 +133,7 @@ class ConferenceApi(remote.Service):
 
     # Define an endpoint for adding sessions
     @endpoints.method(SessionForm, SessionForm,
-                      path = 'conference/session',
+                      path = 'session',
                       http_method = 'POST',
                       name = 'createSession')
     def createSession(self, request):
@@ -202,7 +202,7 @@ class ConferenceApi(remote.Service):
         return self._copySessionToForm(request)
 
     @endpoints.method(SESS_GET_REQUEST, SessionForms,
-            path='conference/session/{websafeConferenceKey}',
+            path='session/{websafeConferenceKey}',
             http_method='GET', name='getConferenceSessions')
     def getConferenceSessions(self, request):
         """Return sessions from requested conference (by websafeConferenceKey)."""
@@ -216,7 +216,7 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(SessionsByTypeForm, SessionForms,
-            path='conference/session/{websafeConferenceKey}/type',
+            path='session/type/{websafeConferenceKey}',
             http_method='GET',
             name='getConferenceSessionsByType')
     def getConferenceSessionsByType(self, request):
@@ -231,7 +231,7 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(SessionsByNameForm, SessionForms,
-            path='conference/session/{websafeConferenceKey}/name',
+            path='session/name/{websafeConferenceKey}',
             http_method='GET',
             name='getConferenceSessionsByName')
     def getConferenceSessionsByName(self, request):
@@ -246,7 +246,7 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(SessionsByDurationForm, SessionForms,
-            path='conference/session/{websafeConferenceKey}/duration',
+            path='session/duration/{websafeConferenceKey}',
             http_method='GET',
             name='getConferenceSessionsByDuration')
     def getConferenceSessionsByDuration(self, request):
@@ -261,7 +261,7 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(SessionsBySpeakerForm, SessionForms,
-            path='conference/speaker',
+            path='speaker',
             http_method='GET',
             name='getSessionsBySpeaker')
     def getSessionsBySpeaker(self, request):
