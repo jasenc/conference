@@ -106,7 +106,7 @@ SESS_GET_REQUEST = endpoints.ResourceContainer(
 
 SESS_POST_REQUEST = endpoints.ResourceContainer(
     SessionForm,
-    websafeConferenceKey=messages.StringField(1, required=True),
+    websafeConferenceKey=messages.StringField(1),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,7 +127,7 @@ class ConferenceApi(remote.Service):
         for field in sf.all_fields():
             if hasattr(sess, field.name):
                 # convert Date to date string; just copy others
-                if field.name == 'date' or field.name 'time'):
+                if (field.name == 'date' or field.name == 'time'):
                     setattr(sf, field.name, str(getattr(sess, field.name)))
                 else:
                     setattr(sf, field.name, getattr(sess, field.name))
@@ -138,7 +138,7 @@ class ConferenceApi(remote.Service):
 
     # Define an endpoint for adding sessions
     @endpoints.method(SESS_POST_REQUEST, SessionForm,
-                      path = 'session/{websafeConferenceKey}',
+                      path = 'session',
                       http_method = 'POST',
                       name = 'createSession')
     def createSession(self, request):
@@ -199,7 +199,7 @@ class ConferenceApi(remote.Service):
         # create Session, send email to organizer confirming
         # creation of Session & return (modified) SessionForm
         Session(**data).put()
-        sesses = Session.query(Session.speaker == data['speaker']).count()
+        sessions = Session.query(Session.speaker == data['speaker']).count()
         if sessions > 1:
             taskqueue.add(params={'speaker': data['speaker']}, url='/tasks/set_featured_speaker')
         # send the request over to the form.
@@ -320,7 +320,7 @@ class ConferenceApi(remote.Service):
         # First we'll grab all of the sessions, using fetch(), that has a speaker.
         sesses = Session.query(Session.speaker == speaker).fetch()
         # If more than one session is returned:
-        if len(sesses) > 1:
+        if len(sesses) >= 2:
             # Update the string to have the new speaker.
             featSpeak = (SPEAKER_TPL % speaker)
             # Set the Memcache with the update.
